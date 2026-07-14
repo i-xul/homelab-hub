@@ -33,3 +33,7 @@ logs/
 # Operating systems
 .DS_Store
 Thumbs.db
+
+# Flask instance data
+backend/instance/*
+!backend/instance/.gitkeep

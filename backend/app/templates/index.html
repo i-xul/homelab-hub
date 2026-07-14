@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>HomeLab Hub</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/main.css') }}"
+    >
+</head>
+<body>
+    <main class="page">
+        <section class="status-card">
+            <p class="eyebrow">HomeLab Hub</p>
+
+            <h1>Backend foundation is running</h1>
+
+            <p>
+                Device discovery, inventory and monitoring will be added
+                incrementally.
+            </p>
+
+            <a href="/api/health">Open API health check</a>
+        </section>
+    </main>
+</body>
+</html>
