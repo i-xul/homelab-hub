@@ -56,9 +56,7 @@ def get_device_by_mac(
 
     normalized_mac = mac_address.strip().lower()
 
-    statement = select(Device).where(
-        Device.mac_address == normalized_mac
-    )
+    statement = select(Device).where(Device.mac_address == normalized_mac)
 
     return database_session.scalar(statement)
 
@@ -75,6 +73,7 @@ def create_device(
     hostname: str | None = None,
     current_ip: str | None = None,
     manufacturer: str | None = None,
+    online: bool = False,
 ) -> Device:
     """
     Create and persist a new device.
@@ -99,6 +98,9 @@ def create_device(
         manufacturer:
             Hardware manufacturer, if available.
 
+        online:
+            Whether the device was online when it was created.
+
     Returns:
         Newly created and persisted Device instance.
 
@@ -119,22 +121,105 @@ def create_device(
     )
 
     if existing_device is not None:
-        raise ValueError(
-            f"Device already exists for MAC address "
-            f"{normalized_mac}."
-        )
+        raise ValueError(f"Device already exists for MAC address {normalized_mac}.")
 
     device = Device(
         mac_address=normalized_mac,
         hostname=hostname,
         current_ip=current_ip,
         manufacturer=manufacturer,
-        online=False,
+        online=online,
         trusted=False,
         pinned=False,
     )
 
     database_session.add(device)
+    database_session.commit()
+    database_session.refresh(device)
+
+    return device
+
+
+# ---------------------------------------------------------
+# Device discovery updates
+# ---------------------------------------------------------
+
+
+def update_device_from_discovery(
+    database_session: Session,
+    device: Device,
+    *,
+    hostname: str | None,
+    current_ip: str,
+    manufacturer: str | None,
+) -> Device:
+    """
+    Update automatically collected information for a device.
+
+    Only discovery-managed fields are modified. Friendly names,
+    tags, trust status and other user-managed information remain
+    unchanged.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+        device:
+            Existing Device instance to update.
+
+        hostname:
+            Hostname reported by the latest discovery scan.
+
+        current_ip:
+            Current network address reported by discovery.
+
+        manufacturer:
+            Manufacturer reported by Nmap, if available.
+
+    Returns:
+        Updated and persisted Device instance.
+    """
+
+    device.current_ip = current_ip
+    device.online = True
+
+    # Do not erase previously discovered information merely
+    # because a later scan could not resolve the same value.
+    if hostname:
+        device.hostname = hostname
+
+    if manufacturer:
+        device.manufacturer = manufacturer
+
+    database_session.commit()
+    database_session.refresh(device)
+
+    return device
+
+
+def mark_device_offline(
+    database_session: Session,
+    device: Device,
+) -> Device:
+    """
+    Mark a device as offline without removing it.
+
+    Devices remain permanently in the inventory until the user
+    explicitly removes them.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+        device:
+            Device that was not present in the completed scan.
+
+    Returns:
+        Updated and persisted Device instance.
+    """
+
+    device.online = False
+
     database_session.commit()
     database_session.refresh(device)
 
