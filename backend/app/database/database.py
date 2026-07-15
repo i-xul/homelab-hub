@@ -70,3 +70,26 @@ SessionLocal = sessionmaker(
     autoflush=False,
     autocommit=False,
 )
+
+# ---------------------------------------------------------
+# Database initialization
+# ---------------------------------------------------------
+
+
+def initialize_database() -> None:
+    """
+    Create all currently registered database tables.
+
+    Importing the model package ensures that every SQLAlchemy
+    model is registered in Base.metadata before create_all()
+    examines the database schema.
+
+    Existing tables and stored data are preserved. SQLAlchemy
+    creates only tables that do not already exist.
+    """
+
+    # Import models inside the function to avoid circular
+    # imports while the application packages are loading.
+    from app.models import Base
+
+    Base.metadata.create_all(bind=engine)

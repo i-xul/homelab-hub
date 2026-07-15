@@ -7,6 +7,7 @@ from flask import Flask, render_template
 
 from .api import register_api_blueprints
 from .config import Config
+from .database import initialize_database
 
 
 def create_app() -> Flask:
@@ -22,6 +23,10 @@ def create_app() -> Flask:
     app.config.from_object(Config)
 
     Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+
+    # Create all missing database tables before the application
+    # begins handling requests.
+    initialize_database()
 
     register_api_blueprints(app)
 
