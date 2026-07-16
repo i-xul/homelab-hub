@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>HomeLab Hub</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div>
+            <p class="eyebrow">HomeLab Hub</p>
+            <h1>Device inventory</h1>
+        </div>
+
+        <div class="header-actions">
+            <a class="secondary-button" href="{{ url_for('devices.list_devices') }}">
+                View API
+            </a>
+
+            <button class="primary-button" type="button" disabled title="Manual synchronization will be added next.">
+                Sync now
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        {% if summary.unknown > 0 %}
+        <section class="unknown-alert">
+            <div>
+                <strong>
+                    {{ summary.unknown }} unknown
+                    {% if summary.unknown == 1 %}
+                    device
+                    {% else %}
+                    devices
+                    {% endif %}
+                </strong>
+
+                <p>
+                    These devices have not yet been identified
+                    as trusted members of the network.
+                </p>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="summary-grid" aria-label="Inventory summary">
+            <article class="summary-card">
+                <span>Total devices</span>
+                <strong>{{ summary.total }}</strong>
+            </article>
+
+            <article class="summary-card">
+                <span>Online</span>
+                <strong>{{ summary.online }}</strong>
+            </article>
+
+            <article class="summary-card">
+                <span>Offline</span>
+                <strong>{{ summary.offline }}</strong>
+            </article>
+
+            <article class="summary-card">
+                <span>Unknown</span>
+                <strong>{{ summary.unknown }}</strong>
+            </article>
+        </section>
+
+        <section class="device-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Primary inventory</p>
+                    <h2>Devices</h2>
+                </div>
+
+                <span class="device-count">
+                    {{ primary_devices | length }}
+                </span>
+            </div>
+
+            {% if primary_devices %}
+            <div class="device-list">
+                {% for device in primary_devices %}
+                <article class="
+                                device-card
+                                {% if not device.online %}
+                                    device-card--inactive
+                                {% endif %}
+                            ">
+                    <div class="device-status-column">
+                        <span class="
+                                        status-indicator
+                                        {% if device.online %}
+                                            status-indicator--online
+                                        {% else %}
+                                            status-indicator--offline
+                                        {% endif %}
+                                    " title="
+                                        {% if device.online %}
+                                            Online
+                                        {% else %}
+                                            Offline
+                                        {% endif %}
+                                    "></span>
+                    </div>
+
+                    <div class="device-main">
+                        <div class="device-title-row">
+                            <h3>{{ device.display_name }}</h3>
+
+                            {% if device.pinned %}
+                            <span class="pin-marker" title="Pinned device">
+                                ★
+                            </span>
+                            {% endif %}
+
+                            {% if not device.trusted %}
+                            <span class="unknown-badge">
+                                Unknown
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="device-metadata">
+                            <span>
+                                {{ device.current_ip or "No IP address" }}
+                            </span>
+
+                            <span>
+                                {{ device.mac_address }}
+                            </span>
+
+                            {% if device.manufacturer %}
+                            <span>
+                                {{ device.manufacturer }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="device-state">
+                        {% if device.online %}
+                        Online
+                        {% else %}
+                        Offline
+                        {% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No primary devices</h3>
+                <p>
+                    Online and pinned devices will appear here.
+                </p>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="device-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Previously detected</p>
+                    <h2>Offline</h2>
+                </div>
+
+                <span class="device-count">
+                    {{ offline_devices | length }}
+                </span>
+            </div>
+
+            {% if offline_devices %}
+            <div class="device-list">
+                {% for device in offline_devices %}
+                <article class="device-card device-card--inactive">
+                    <div class="device-status-column">
+                        <span class="
+                                        status-indicator
+                                        status-indicator--offline
+                                    " title="Offline"></span>
+                    </div>
+
+                    <div class="device-main">
+                        <div class="device-title-row">
+                            <h3>{{ device.display_name }}</h3>
+
+                            {% if not device.trusted %}
+                            <span class="unknown-badge">
+                                Unknown
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="device-metadata">
+                            <span>
+                                {{ device.current_ip or "No IP address" }}
+                            </span>
+
+                            <span>
+                                {{ device.mac_address }}
+                            </span>
+
+                            {% if device.last_discovery_at %}
+                            <span>
+                                Last seen
+                                {{ device.last_discovery_at }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="device-state">
+                        Offline
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No offline devices</h3>
+                <p>
+                    Previously detected non-pinned devices
+                    will appear here when they go offline.
+                </p>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+
+</html>

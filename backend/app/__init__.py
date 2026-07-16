@@ -3,11 +3,12 @@
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask
 
 from .api import register_api_blueprints
 from .config import Config
 from .database import initialize_database
+from .web import register_web_blueprints
 
 
 def create_app() -> Flask:
@@ -29,11 +30,6 @@ def create_app() -> Flask:
     initialize_database()
 
     register_api_blueprints(app)
-
-    @app.get("/")
-    def index():
-        """Render the initial HomeLab Hub landing page."""
-
-        return render_template("index.html")
+    register_web_blueprints(app)
 
     return app
