@@ -22,8 +22,10 @@
 """
 
 from __future__ import annotations
+from datetime import datetime
 
 from sqlalchemy import Boolean
+from sqlalchemy import DateTime
 from sqlalchemy import Integer
 from sqlalchemy import String
 
@@ -101,6 +103,22 @@ class Device(Base, TimestampMixin):
     online: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
+        nullable=False,
+    )
+
+    # ---------------------------------------------------------
+    # Discovery state
+    # ---------------------------------------------------------
+
+    last_discovery_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    consecutive_missed_scans: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
     )
 
     # ---------------------------------------------------------

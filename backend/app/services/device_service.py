@@ -27,6 +27,9 @@ from sqlalchemy.orm import Session
 
 from app.models import Device
 
+from datetime import UTC
+from datetime import datetime
+
 
 # ---------------------------------------------------------
 # Device lookup
@@ -129,6 +132,8 @@ def create_device(
         current_ip=current_ip,
         manufacturer=manufacturer,
         online=online,
+        last_discovery_at=None,
+        consecutive_missed_scans=0,
         trusted=False,
         pinned=False,
     )
@@ -190,6 +195,11 @@ def update_device_from_discovery(
 
     if manufacturer:
         device.manufacturer = manufacturer
+
+    device.last_discovery_at = datetime.now(UTC)
+
+    # Successful discovery resets the missed scan counter.
+    device.consecutive_missed_scans = 0
 
     database_session.commit()
     database_session.refresh(device)

@@ -2,3 +2,4 @@ Flask>=3.1,<4.0
 python-dotenv>=1.1,<2.0
 
 SQLAlchemy>=2.0,<3.0
+Alembic>=1.18,<2.0
