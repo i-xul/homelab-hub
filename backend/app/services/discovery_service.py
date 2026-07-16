@@ -10,7 +10,8 @@
      HomeLab Hub device inventory.
 
      The service creates new devices, updates existing devices
-     and returns a summary of the completed synchronization.
+     and records continuous online sessions for successfully
+     detected devices.
 
  Author:
      H A (GitHub: i-xul)
@@ -31,6 +32,7 @@ from app.discovery import NetworkScanner
 from .device_service import create_device
 from .device_service import get_device_by_mac
 from .device_service import update_device_from_discovery
+from .device_session_service import record_device_seen
 
 
 @dataclass(slots=True)
@@ -54,11 +56,15 @@ def synchronize_discovered_devices(
     network: str,
 ) -> DiscoverySyncResult:
     """
-    Scan a network and synchronize reliable results.
+    Scan a network and synchronize reliable discovery results.
 
     MAC addresses are currently required for persistent device
     identity. Observations without a MAC address are counted but
     not written to the database because IP addresses may change.
+
+    Every successfully synchronized device also receives an
+    open online session. Later observations update the same
+    session instead of creating duplicate sessions.
 
     Args:
         database_session:
@@ -94,7 +100,7 @@ def synchronize_discovered_devices(
         )
 
         if existing_device is None:
-            create_device(
+            device = create_device(
                 database_session,
                 mac_address=normalized_mac,
                 hostname=discovered_device.hostname,
@@ -103,15 +109,28 @@ def synchronize_discovered_devices(
                 online=True,
             )
 
+            # Open the device's first online session.
+            record_device_seen(
+                database_session,
+                device,
+            )
+
             result.created += 1
             continue
 
-        update_device_from_discovery(
+        device = update_device_from_discovery(
             database_session,
             existing_device,
             hostname=discovered_device.hostname,
             current_ip=discovered_device.ip_address,
             manufacturer=discovered_device.manufacturer,
+        )
+
+        # Refresh the existing online session without creating
+        # another session for the same continuous online period.
+        record_device_seen(
+            database_session,
+            device,
         )
 
         result.updated += 1
