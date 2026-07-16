@@ -29,6 +29,7 @@ import xml.etree.ElementTree as ElementTree
 
 from .models import DiscoveredDevice
 from .scanner import DiscoveryError
+from app.settings import NMAP_TIMEOUT_SECONDS
 
 
 class NmapScanner:
@@ -47,7 +48,7 @@ class NmapScanner:
         self,
         *,
         executable: str = "nmap",
-        timeout_seconds: int = 120,
+        timeout_seconds: int = NMAP_TIMEOUT_SECONDS,
     ) -> None:
         """
         Initialize the Nmap scanner.
@@ -68,9 +69,7 @@ class NmapScanner:
         executable_path = shutil.which(executable)
 
         if executable_path is None:
-            raise DiscoveryError(
-                f"Nmap executable was not found: {executable}"
-            )
+            raise DiscoveryError(f"Nmap executable was not found: {executable}")
 
         self._executable = executable_path
         self._timeout_seconds = timeout_seconds
@@ -113,24 +112,16 @@ class NmapScanner:
             )
         except subprocess.TimeoutExpired as error:
             raise DiscoveryError(
-                f"Nmap scan exceeded the "
-                f"{self._timeout_seconds}-second timeout."
+                f"Nmap scan exceeded the {self._timeout_seconds}-second timeout."
             ) from error
         except OSError as error:
-            raise DiscoveryError(
-                f"Nmap could not be started: {error}"
-            ) from error
+            raise DiscoveryError(f"Nmap could not be started: {error}") from error
 
         if completed_process.returncode != 0:
             error_message = completed_process.stderr.strip()
 
             raise DiscoveryError(
-                "Nmap scan failed"
-                + (
-                    f": {error_message}"
-                    if error_message
-                    else "."
-                )
+                "Nmap scan failed" + (f": {error_message}" if error_message else ".")
             )
 
         return self._parse_xml(completed_process.stdout)
@@ -164,9 +155,7 @@ class NmapScanner:
                 strict=False,
             )
         except ValueError as error:
-            raise DiscoveryError(
-                f"Invalid network target: {network}"
-            ) from error
+            raise DiscoveryError(f"Invalid network target: {network}") from error
 
     @staticmethod
     def _parse_xml(xml_output: str) -> list[DiscoveredDevice]:
@@ -192,19 +181,14 @@ class NmapScanner:
         try:
             root = ElementTree.fromstring(xml_output)
         except ElementTree.ParseError as error:
-            raise DiscoveryError(
-                "Nmap returned invalid XML output."
-            ) from error
+            raise DiscoveryError("Nmap returned invalid XML output.") from error
 
         discovered_devices: list[DiscoveredDevice] = []
 
         for host_element in root.findall("host"):
             status_element = host_element.find("status")
 
-            if (
-                status_element is None
-                or status_element.get("state") != "up"
-            ):
+            if status_element is None or status_element.get("state") != "up":
                 continue
 
             addresses = {
@@ -224,9 +208,7 @@ class NmapScanner:
                 continue
 
             mac_element = addresses.get("mac")
-            hostname_element = host_element.find(
-                "hostnames/hostname"
-            )
+            hostname_element = host_element.find("hostnames/hostname")
 
             discovered_devices.append(
                 DiscoveredDevice(
@@ -242,16 +224,12 @@ class NmapScanner:
                         else None
                     ),
                     manufacturer=(
-                        mac_element.get("vendor")
-                        if mac_element is not None
-                        else None
+                        mac_element.get("vendor") if mac_element is not None else None
                     ),
                 )
             )
 
         return sorted(
             discovered_devices,
-            key=lambda device: ipaddress.ip_address(
-                device.ip_address
-            ),
+            key=lambda device: ipaddress.ip_address(device.ip_address),
         )
