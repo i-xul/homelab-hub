@@ -17,14 +17,19 @@
             <h1>Device inventory</h1>
         </div>
 
-        <div class="header-actions">
-            <a class="secondary-button" href="{{ url_for('devices.list_devices') }}">
-                View API
-            </a>
+        <div class="header-controls">
+            <div class="header-actions">
+                <a class="secondary-button" href="{{ url_for('devices.list_devices') }}">
+                    View API
+                </a>
 
-            <button class="primary-button" type="button" disabled title="Manual synchronization will be added next.">
-                Sync now
-            </button>
+                <button id="sync-button" class="primary-button" type="button">
+                    Sync now
+                </button>
+            </div>
+
+            <p id="sync-status" class="sync-status" role="status" aria-live="polite"></p>
+        </div>
         </div>
     </header>
 
@@ -232,6 +237,7 @@
             {% endif %}
         </section>
     </main>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 
 </html>

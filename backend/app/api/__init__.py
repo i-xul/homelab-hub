@@ -23,6 +23,7 @@ from flask import Flask
 
 from .devices import devices_bp
 from .health import health_bp
+from .scan import scan_bp
 
 
 def register_api_blueprints(app: Flask) -> None:
@@ -43,5 +44,10 @@ def register_api_blueprints(app: Flask) -> None:
 
     app.register_blueprint(
         devices_bp,
+        url_prefix="/api",
+    )
+
+    app.register_blueprint(
+        scan_bp,
         url_prefix="/api",
     )
