@@ -33,6 +33,8 @@ from .device_service import create_device
 from .device_service import get_device_by_mac
 from .device_service import update_device_from_discovery
 from .device_session_service import record_device_seen
+from .device_service import get_all_devices
+from .device_session_service import record_device_missed
 
 
 @dataclass(slots=True)
@@ -48,12 +50,16 @@ class DiscoverySyncResult:
     created: int = 0
     updated: int = 0
     skipped_without_mac: int = 0
+    missed: int = 0
+    marked_offline: int = 0
 
 
 def synchronize_discovered_devices(
     database_session: Session,
     scanner: NetworkScanner,
     network: str,
+    *,
+    track_missing_devices: bool = False,
 ) -> DiscoverySyncResult:
     """
     Scan a network and synchronize reliable discovery results.
@@ -76,6 +82,11 @@ def synchronize_discovered_devices(
         network:
             Network target in CIDR notation.
 
+        track_missing_devices:
+            Whether devices absent from this scan should receive
+            a missed-scan count. This must only be enabled when
+            the scan returns reliable MAC-address coverage.
+
     Returns:
         Summary describing how many devices were detected,
         created, updated or skipped.
@@ -87,6 +98,7 @@ def synchronize_discovered_devices(
         detected=len(discovered_devices),
     )
 
+    observed_mac_addresses: set[str] = set()
     for discovered_device in discovered_devices:
         if not discovered_device.mac_address:
             result.skipped_without_mac += 1
@@ -98,6 +110,8 @@ def synchronize_discovered_devices(
             database_session,
             normalized_mac,
         )
+
+        observed_mac_addresses.add(normalized_mac)
 
         if existing_device is None:
             device = create_device(
@@ -134,5 +148,26 @@ def synchronize_discovered_devices(
         )
 
         result.updated += 1
+
+    # Missing-device processing is intentionally optional.
+    # A scan without reliable MAC-address coverage must never
+    # mark the complete inventory offline.
+    if track_missing_devices:
+        for stored_device in get_all_devices(database_session):
+            if stored_device.mac_address in observed_mac_addresses:
+                continue
+
+            if not stored_device.online:
+                continue
+
+            result.missed += 1
+
+            changed_to_offline = record_device_missed(
+                database_session,
+                stored_device,
+            )
+
+            if changed_to_offline:
+                result.marked_offline += 1
 
     return result

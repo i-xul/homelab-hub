@@ -64,6 +64,28 @@ def get_device_by_mac(
     return database_session.scalar(statement)
 
 
+def get_all_devices(
+    database_session: Session,
+) -> list[Device]:
+    """
+    Return every device stored in the inventory.
+
+    Devices are returned in database identifier order to keep
+    processing and test output deterministic.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+    Returns:
+        List containing all stored Device instances.
+    """
+
+    statement = select(Device).order_by(Device.id)
+
+    return list(database_session.scalars(statement).all())
+
+
 # ---------------------------------------------------------
 # Device creation
 # ---------------------------------------------------------
