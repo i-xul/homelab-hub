@@ -256,3 +256,38 @@ def mark_device_offline(
     database_session.refresh(device)
 
     return device
+
+
+# ---------------------------------------------------------
+# Device list queries
+# ---------------------------------------------------------
+
+
+def get_inventory_devices(
+    database_session: Session,
+) -> list[Device]:
+    """
+    Return all inventory devices in a predictable display order.
+
+    Online devices are returned first. Within each state,
+    pinned devices are listed before non-pinned devices.
+    Devices are then ordered by friendly name, hostname and
+    database identifier.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+    Returns:
+        Ordered list of all stored Device instances.
+    """
+
+    statement = select(Device).order_by(
+        Device.online.desc(),
+        Device.pinned.desc(),
+        Device.friendly_name.asc(),
+        Device.hostname.asc(),
+        Device.id.asc(),
+    )
+
+    return list(database_session.scalars(statement).all())

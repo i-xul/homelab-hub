@@ -32,6 +32,7 @@ from .device_service import get_all_devices
 from .device_session_service import close_device_session
 from .device_session_service import record_device_missed
 from .inventory_service import run_inventory_scan
+from .device_service import get_inventory_devices
 
 
 __all__ = [
@@ -40,6 +41,7 @@ __all__ = [
     "DiscoverySyncResult",
     "get_all_devices",
     "get_device_by_mac",
+    "get_inventory_devices",
     "get_open_device_session",
     "mark_device_offline",
     "record_device_missed",
