@@ -136,6 +136,18 @@
                                 {{ device.current_ip or "No IP address" }}
                             </span>
 
+                            {% if device.ip_assignment in ["static", "reserved"] %}
+                            <span class="persistent-ip-marker" title="
+                {% if device.ip_assignment == 'static' %}
+                    Static IP
+                {% else %}
+                    DHCP reservation
+                {% endif %}
+            ">
+                                ★ {{ device.ip_assignment | capitalize }}
+                            </span>
+                            {% endif %}
+
                             <span>
                                 {{ device.mac_address }}
                             </span>
@@ -148,12 +160,23 @@
                         </div>
                     </div>
 
-                    <div class="device-state">
-                        {% if device.online %}
-                        Online
-                        {% else %}
-                        Offline
-                        {% endif %}
+                    <div class="device-actions">
+                        <div class="device-state">
+                            {% if device.online %}
+                            Online
+                            {% else %}
+                            Offline
+                            {% endif %}
+                        </div>
+
+                        <button class="device-edit-button" type="button" data-device-id="{{ device.id }}"
+                            data-friendly-name="{{ device.friendly_name or '' }}"
+                            data-trusted="{{ 'true' if device.trusted else 'false' }}"
+                            data-pinned="{{ 'true' if device.pinned else 'false' }}"
+                            data-ip-assignment="{{ device.ip_assignment }}"
+                            data-expected-ip="{{ device.expected_ip or '' }}">
+                            Edit
+                        </button>
                     </div>
                 </article>
                 {% endfor %}
@@ -207,21 +230,47 @@
                                 {{ device.current_ip or "No IP address" }}
                             </span>
 
+                            {% if device.ip_assignment in ["static", "reserved"] %}
+                            <span class="persistent-ip-marker" title="
+                {% if device.ip_assignment == 'static' %}
+                    Static IP
+                {% else %}
+                    DHCP reservation
+                {% endif %}
+            ">
+                                ★ {{ device.ip_assignment | capitalize }}
+                            </span>
+                            {% endif %}
+
                             <span>
                                 {{ device.mac_address }}
                             </span>
 
-                            {% if device.last_discovery_at %}
+                            {% if device.manufacturer %}
                             <span>
-                                Last seen
-                                {{ device.last_discovery_at }}
+                                {{ device.manufacturer }}
                             </span>
                             {% endif %}
                         </div>
                     </div>
 
-                    <div class="device-state">
-                        Offline
+                    <div class="device-actions">
+                        <div class="device-state">
+                            {% if device.online %}
+                            Online
+                            {% else %}
+                            Offline
+                            {% endif %}
+                        </div>
+
+                        <button class="device-edit-button" type="button" data-device-id="{{ device.id }}"
+                            data-friendly-name="{{ device.friendly_name or '' }}"
+                            data-trusted="{{ 'true' if device.trusted else 'false' }}"
+                            data-pinned="{{ 'true' if device.pinned else 'false' }}"
+                            data-ip-assignment="{{ device.ip_assignment }}"
+                            data-expected-ip="{{ device.expected_ip or '' }}">
+                            Edit
+                        </button>
                     </div>
                 </article>
                 {% endfor %}
@@ -237,6 +286,81 @@
             {% endif %}
         </section>
     </main>
+    <div id="device-edit-modal" class="modal-overlay" hidden>
+        <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="device-edit-title">
+            <div class="modal-header">
+                <div>
+                    <p class="eyebrow">Device management</p>
+                    <h2 id="device-edit-title">
+                        Edit device
+                    </h2>
+                </div>
+
+                <button id="device-edit-close" class="modal-close-button" type="button" aria-label="Close">
+                    ×
+                </button>
+            </div>
+
+            <form id="device-edit-form">
+                <input id="device-edit-id" type="hidden">
+
+                <label class="form-field">
+                    <span>Friendly name</span>
+
+                    <input id="device-edit-friendly-name" type="text" maxlength="255">
+                </label>
+
+                <div class="form-checkbox-grid">
+                    <label class="checkbox-field">
+                        <input id="device-edit-trusted" type="checkbox">
+                        <span>Trusted device</span>
+                    </label>
+
+                    <label class="checkbox-field">
+                        <input id="device-edit-pinned" type="checkbox">
+                        <span>Pinned device</span>
+                    </label>
+                </div>
+
+                <label class="form-field">
+                    <span>IP assignment</span>
+
+                    <select id="device-edit-ip-assignment">
+                        <option value="unknown">
+                            Unknown
+                        </option>
+                        <option value="dhcp">
+                            DHCP
+                        </option>
+                        <option value="reserved">
+                            DHCP reservation
+                        </option>
+                        <option value="static">
+                            Static IP
+                        </option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span>Expected IP</span>
+
+                    <input id="device-edit-expected-ip" type="text" placeholder="192.168.1.100">
+                </label>
+
+                <p id="device-edit-status" class="form-status" role="status" aria-live="polite"></p>
+
+                <div class="modal-actions">
+                    <button id="device-edit-cancel" class="secondary-button" type="button">
+                        Cancel
+                    </button>
+
+                    <button class="primary-button" type="submit">
+                        Save changes
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 

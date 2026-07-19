@@ -92,6 +92,8 @@ def dashboard():
                 "hostname": device.hostname,
                 "friendly_name": device.friendly_name,
                 "current_ip": device.current_ip,
+                "ip_assignment": device.ip_assignment,
+                "expected_ip": device.expected_ip,
                 "mac_address": device.mac_address,
                 "manufacturer": device.manufacturer,
                 "online": device.online,
