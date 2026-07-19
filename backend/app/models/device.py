@@ -129,6 +129,21 @@ class Device(Base, TimestampMixin):
         String(255),
     )
 
+    # ---------------------------------------------------------
+    # User-managed network configuration
+    # ---------------------------------------------------------
+
+    ip_assignment: Mapped[str] = mapped_column(
+        String(20),
+        default="unknown",
+        nullable=False,
+    )
+
+    expected_ip: Mapped[str | None] = mapped_column(
+        String(45),
+        nullable=True,
+    )
+
     trusted: Mapped[bool] = mapped_column(
         Boolean,
         default=False,

@@ -156,6 +156,8 @@ def create_device(
         online=online,
         last_discovery_at=None,
         consecutive_missed_scans=0,
+        ip_assignment="unknown",
+        expected_ip=None,
         trusted=False,
         pinned=False,
     )

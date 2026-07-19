@@ -92,6 +92,8 @@ def _serialize_device(
         "hostname": device.hostname,
         "friendly_name": device.friendly_name,
         "current_ip": device.current_ip,
+        "ip_assignment": device.ip_assignment,
+        "expected_ip": device.expected_ip,
         "online": device.online,
         "trusted": device.trusted,
         "pinned": device.pinned,
