@@ -30,11 +30,16 @@ import xml.etree.ElementTree as ElementTree
 from .models import DiscoveredDevice
 from .scanner import DiscoveryError
 from app.settings import NMAP_TIMEOUT_SECONDS
+from pathlib import Path
 
 
 class NmapScanner:
     """
-    Discover network devices by using an Nmap ping scan.
+    Discover local-network devices by using Nmap ARP discovery.
+
+    ARP discovery provides reliable MAC-address information for
+    devices on the same Layer 2 network when sufficient privileges
+    are available.
 
     Nmap XML output is used instead of human-readable terminal
     output because XML provides a stable and structured format
@@ -78,6 +83,10 @@ class NmapScanner:
         """
         Scan a network and return all hosts reported as online.
 
+        The scan uses ARP discovery for local-network targets so that
+        MAC addresses and vendor information can be collected when
+        Nmap has the required privileges.
+
         Args:
             network:
                 IPv4 or IPv6 network in CIDR notation, such as
@@ -96,6 +105,8 @@ class NmapScanner:
 
         command = [
             self._executable,
+            "--privileged",
+            "-PR",
             "-sn",
             "-oX",
             "-",
@@ -156,6 +167,95 @@ class NmapScanner:
             )
         except ValueError as error:
             raise DiscoveryError(f"Invalid network target: {network}") from error
+
+    @staticmethod
+    def _get_local_ipv4_interfaces() -> dict[str, str]:
+        """
+        Return local IPv4 addresses mapped to network interfaces.
+
+        The Linux ``ip`` command is used so that the scanner can
+        identify when an Nmap result represents the machine that
+        is running HomeLab Hub.
+
+        Returns:
+            Mapping of IPv4 addresses to interface names.
+
+        Raises:
+            DiscoveryError:
+                If local interface information cannot be read.
+        """
+
+        command = [
+            "ip",
+            "-o",
+            "-4",
+            "addr",
+            "show",
+        ]
+
+        completed_process = subprocess.run(
+            command,
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+
+        if completed_process.returncode != 0:
+            error_message = completed_process.stderr.strip()
+
+            raise DiscoveryError(
+                "Failed to read local network interfaces"
+                + (f": {error_message}" if error_message else ".")
+            )
+
+        interfaces: dict[str, str] = {}
+
+        for line in completed_process.stdout.splitlines():
+            parts = line.split()
+
+            if len(parts) < 4:
+                continue
+
+            interface_name = parts[1]
+            address_with_prefix = parts[3]
+
+            try:
+                ipv4_address = str(ipaddress.ip_interface(address_with_prefix).ip)
+            except ValueError:
+                continue
+
+            interfaces[ipv4_address] = interface_name
+
+        return interfaces
+
+    @staticmethod
+    def _get_interface_mac_address(
+        interface_name: str,
+    ) -> str | None:
+        """
+        Return the MAC address assigned to a Linux interface.
+
+        Args:
+            interface_name:
+                Linux network interface name, such as ``eth0``
+                or ``eno1``.
+
+        Returns:
+            Lowercase MAC address, or None when it cannot be
+            determined.
+        """
+
+        address_path = Path("/sys/class/net") / interface_name / "address"
+
+        try:
+            mac_address = address_path.read_text(encoding="utf-8").strip()
+        except OSError:
+            return None
+
+        if not mac_address:
+            return None
+
+        return mac_address.lower()
 
     @staticmethod
     def _parse_xml(xml_output: str) -> list[DiscoveredDevice]:
@@ -228,6 +328,23 @@ class NmapScanner:
                     ),
                 )
             )
+
+        # Nmap does not normally report a MAC address for the
+        # machine performing the scan itself. Resolve local IPv4
+        # addresses to their interfaces and fill that information
+        # from Linux sysfs.
+        local_interfaces = NmapScanner._get_local_ipv4_interfaces()
+
+        for device in discovered_devices:
+            if device.mac_address is not None:
+                continue
+
+            interface_name = local_interfaces.get(device.ip_address)
+
+            if interface_name is None:
+                continue
+
+            device.mac_address = NmapScanner._get_interface_mac_address(interface_name)
 
         return sorted(
             discovered_devices,
