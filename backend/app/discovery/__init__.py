@@ -23,11 +23,13 @@ from .models import DiscoveredDevice
 from .scanner import DiscoveryError
 from .scanner import NetworkScanner
 from .nmap_scanner import NmapScanner
+from .hostname_resolver import HostnameResolver
 
 
 __all__ = [
     "DiscoveredDevice",
     "DiscoveryError",
+    "HostnameResolver",
     "NetworkScanner",
     "NmapScanner",
 ]

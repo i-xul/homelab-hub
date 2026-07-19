@@ -31,6 +31,7 @@ from .models import DiscoveredDevice
 from .scanner import DiscoveryError
 from app.settings import NMAP_TIMEOUT_SECONDS
 from pathlib import Path
+from .hostname_resolver import HostnameResolver
 
 
 class NmapScanner:
@@ -345,6 +346,26 @@ class NmapScanner:
                 continue
 
             device.mac_address = NmapScanner._get_interface_mac_address(interface_name)
+
+        # Enrich devices that Nmap could not name by using the
+        # local resolver stack and mDNS concurrently.
+        unnamed_addresses = [
+            device.ip_address for device in discovered_devices if not device.hostname
+        ]
+
+        if unnamed_addresses:
+            hostname_resolver = HostnameResolver()
+
+            resolved_hostnames = hostname_resolver.resolve_many(unnamed_addresses)
+
+            for device in discovered_devices:
+                if device.hostname:
+                    continue
+
+                resolved_hostname = resolved_hostnames.get(device.ip_address)
+
+                if resolved_hostname is not None:
+                    device.hostname = resolved_hostname
 
         return sorted(
             discovered_devices,
