@@ -33,6 +33,8 @@ from .device_session_service import close_device_session
 from .device_session_service import record_device_missed
 from .inventory_service import run_inventory_scan
 from .device_service import get_inventory_devices
+from .device_service import get_device_by_id
+from .device_service import update_device_metadata
 
 
 __all__ = [
@@ -49,4 +51,6 @@ __all__ = [
     "run_inventory_scan",
     "synchronize_discovered_devices",
     "update_device_from_discovery",
+    "get_device_by_id",
+    "update_device_metadata",
 ]

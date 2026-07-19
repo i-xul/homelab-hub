@@ -64,6 +64,30 @@ def get_device_by_mac(
     return database_session.scalar(statement)
 
 
+def get_device_by_id(
+    database_session: Session,
+    device_id: int,
+) -> Device | None:
+    """
+    Return a device matching the supplied database identifier.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+        device_id:
+            Database identifier of the device.
+
+    Returns:
+        Matching Device instance, or None when no device exists.
+    """
+
+    return database_session.get(
+        Device,
+        device_id,
+    )
+
+
 def get_all_devices(
     database_session: Session,
 ) -> list[Device]:
@@ -293,3 +317,78 @@ def get_inventory_devices(
     )
 
     return list(database_session.scalars(statement).all())
+
+
+# ---------------------------------------------------------
+# User-managed device updates
+# ---------------------------------------------------------
+
+
+def update_device_metadata(
+    database_session: Session,
+    device: Device,
+    *,
+    friendly_name: str | None = None,
+    trusted: bool | None = None,
+    pinned: bool | None = None,
+    ip_assignment: str | None = None,
+    expected_ip: str | None = None,
+) -> Device:
+    """
+    Update user-managed inventory metadata for a device.
+
+    Only explicitly supplied values are changed. Automatically
+    discovered fields such as hostname, MAC address and current
+    IP address are intentionally excluded.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+        device:
+            Device instance to update.
+
+        friendly_name:
+            Optional user-defined display name.
+
+        trusted:
+            Whether the device is recognized as belonging to the
+            trusted environment.
+
+        pinned:
+            Whether the device should remain in the primary
+            Devices list while offline.
+
+        ip_assignment:
+            Expected IP assignment type.
+
+        expected_ip:
+            User-defined expected static or reserved IP address.
+
+    Returns:
+        Updated and persisted Device instance.
+    """
+
+    if friendly_name is not None:
+        normalized_name = friendly_name.strip()
+
+        device.friendly_name = normalized_name if normalized_name else None
+
+    if trusted is not None:
+        device.trusted = trusted
+
+    if pinned is not None:
+        device.pinned = pinned
+
+    if ip_assignment is not None:
+        device.ip_assignment = ip_assignment
+
+    if expected_ip is not None:
+        normalized_ip = expected_ip.strip()
+
+        device.expected_ip = normalized_ip if normalized_ip else None
+
+    database_session.commit()
+    database_session.refresh(device)
+
+    return device
