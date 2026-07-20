@@ -1,21 +1,16 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>
         {{ device.display_name }} | HomeLab Hub
     </title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/main.css') }}"
-    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
 <body>
@@ -29,10 +24,7 @@
         </div>
 
         <div class="header-actions">
-            <a
-                class="secondary-button"
-                href="{{ url_for('web.dashboard') }}"
-            >
+            <a class="secondary-button" href="{{ url_for('web.dashboard') }}">
                 Back to inventory
             </a>
         </div>
@@ -41,41 +33,39 @@
     <main class="dashboard">
         <section class="device-detail-hero">
             <div class="device-detail-status">
-                <span
-                    class="
+                <span class="
                         status-indicator
                         {% if device.online %}
                             status-indicator--online
                         {% else %}
                             status-indicator--offline
                         {% endif %}
-                    "
-                ></span>
+                    "></span>
 
                 <strong>
                     {% if device.online %}
-                        Online
+                    Online
                     {% else %}
-                        Offline
+                    Offline
                     {% endif %}
                 </strong>
             </div>
 
             <div class="device-detail-badges">
                 {% if device.trusted %}
-                    <span class="detail-badge">
-                        Trusted
-                    </span>
+                <span class="detail-badge">
+                    Trusted
+                </span>
                 {% else %}
-                    <span class="unknown-badge">
-                        Unknown
-                    </span>
+                <span class="unknown-badge">
+                    Unknown
+                </span>
                 {% endif %}
 
                 {% if device.pinned %}
-                    <span class="detail-badge">
-                        ★ Pinned
-                    </span>
+                <span class="detail-badge">
+                    ★ Pinned
+                </span>
                 {% endif %}
             </div>
         </section>
@@ -180,6 +170,132 @@
             <div class="section-heading">
                 <div>
                     <p class="eyebrow">
+                        Presence
+                    </p>
+
+                    <h2>Session status</h2>
+                </div>
+            </div>
+
+            <dl class="detail-grid">
+                <div class="detail-item">
+                    <dt>First seen</dt>
+                    <dd>
+                        {{ history.first_seen or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Last seen</dt>
+                    <dd>
+                        {{ history.last_seen or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Observed sessions</dt>
+                    <dd>
+                        {{ history.session_count }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Current session started</dt>
+                    <dd>
+                        {% if history.current_session %}
+                        {{
+                        history.current_session.session_start
+                        }}
+                        {% else %}
+                        Device is offline
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Current session duration</dt>
+                    <dd>
+                        {{
+                        history.current_session_duration
+                        or "Not active"
+                        }}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="device-detail-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
+                        History
+                    </p>
+
+                    <h2>Recent sessions</h2>
+                </div>
+
+                <span class="device-count">
+                    {{ sessions | length }}
+                </span>
+            </div>
+
+            {% if sessions %}
+            <div class="session-list">
+                {% for session in sessions[:10] %}
+                <article class="session-card">
+                    <div>
+                        <strong>
+                            {{ session.session_start }}
+                        </strong>
+
+                        <div class="device-metadata">
+                            <span>
+                                Last seen:
+                                {{ session.last_seen }}
+                            </span>
+
+                            <span>
+                                {% if session.session_end %}
+                                Ended:
+                                {{ session.session_end }}
+                                {% else %}
+                                Currently active
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <span class="
+                            session-state
+                            {% if not session.session_end %}
+                                session-state--active
+                            {% endif %}
+                        ">
+                        {% if session.session_end %}
+                        Closed
+                        {% else %}
+                        Active
+                        {% endif %}
+                    </span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No session history</h3>
+
+                <p>
+                    Session history will appear after the device
+                    has been observed by network discovery.
+                </p>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="device-detail-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
                         Discovery
                     </p>
 
@@ -210,6 +326,8 @@
                 </div>
             </dl>
         </section>
+
     </main>
 </body>
+
 </html>

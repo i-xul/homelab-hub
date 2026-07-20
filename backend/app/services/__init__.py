@@ -35,6 +35,7 @@ from .inventory_service import run_inventory_scan
 from .device_service import get_inventory_devices
 from .device_service import get_device_by_id
 from .device_service import update_device_metadata
+from .device_session_service import get_device_sessions
 
 
 __all__ = [
@@ -44,6 +45,7 @@ __all__ = [
     "get_all_devices",
     "get_device_by_mac",
     "get_inventory_devices",
+    "get_device_sessions",
     "get_open_device_session",
     "mark_device_offline",
     "record_device_missed",

@@ -248,3 +248,55 @@ def record_device_missed(
         database_session.refresh(open_session)
 
     return True
+
+
+# ---------------------------------------------------------
+# Device session queries
+# ---------------------------------------------------------
+
+
+def get_device_sessions(
+    database_session: Session,
+    device_id: int,
+    *,
+    limit: int | None = None,
+) -> list[DeviceSession]:
+    """
+    Return recorded online sessions for one device.
+
+    Sessions are ordered from newest to oldest so that the most
+    recent activity can be displayed first in the device detail
+    view.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+        device_id:
+            Database identifier of the requested device.
+
+        limit:
+            Optional maximum number of sessions to return.
+
+    Returns:
+        List of DeviceSession instances ordered by session start
+        time from newest to oldest.
+
+    Raises:
+        ValueError:
+            If limit is supplied with a value less than one.
+    """
+
+    if limit is not None and limit < 1:
+        raise ValueError("Session query limit must be at least one.")
+
+    statement = (
+        select(DeviceSession)
+        .where(DeviceSession.device_id == device_id)
+        .order_by(DeviceSession.session_start.desc())
+    )
+
+    if limit is not None:
+        statement = statement.limit(limit)
+
+    return list(database_session.scalars(statement).all())

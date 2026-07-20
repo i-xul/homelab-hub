@@ -397,6 +397,33 @@ a {
     color: #f3f4f6;
 }
 
+.session-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.session-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #303640;
+    border-radius: 0.8rem;
+    background: #1a1d24;
+}
+
+.session-state {
+    color: #9299a4;
+    font-size: 0.75rem;
+    font-weight: 750;
+    text-transform: uppercase;
+}
+
+.session-state--active {
+    color: #76d59b;
+}
+
 @media (max-width: 48rem) {
     .site-header {
         align-items: flex-start;
@@ -443,6 +470,11 @@ a {
 
     .detail-grid {
         grid-template-columns: 1fr;
+    }
+
+    .session-card {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
 }
