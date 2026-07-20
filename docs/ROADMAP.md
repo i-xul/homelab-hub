@@ -29,7 +29,7 @@ Tasks:
 
 Status:
 
-🟡 In Progress
+🟢 Completed
 
 ---
 
@@ -53,6 +53,24 @@ Tasks:
 Expected result:
 
 The application can build a persistent inventory of network devices.
+
+Status:
+
+🟡 In Progress
+
+Implemented:
+
+* Network scanning with Nmap and ARP discovery
+* MAC address detection
+* Hostname enrichment
+* Manufacturer detection
+* Automatic device creation and updates
+* Manual synchronization
+
+Remaining:
+
+* Automatic scheduled scanning
+* Scan overlap protection
 
 ---
 
@@ -78,6 +96,26 @@ Expected result:
 
 Users can manage their complete homelab inventory.
 
+Status:
+
+🟡 In Progress
+
+Implemented:
+
+* Known and unknown device management
+* Online device state
+* Device metadata editing
+* IP assignment tracking
+* Device detail view
+
+Remaining:
+
+* Reliable automatic offline state tracking
+* Pinned-device behavior
+* Tags
+* Notes
+* Photos
+
 ---
 
 # Milestone 4 — Device Sessions
@@ -98,6 +136,26 @@ Tasks:
 Expected result:
 
 The application keeps historical online/offline information.
+
+Status:
+
+🟡 In Progress
+
+Implemented:
+
+* Session creation
+* Active session tracking
+* Session history storage
+* Session history display
+* Current session duration
+* First-seen and last-seen information
+
+Remaining:
+
+* Automatic session closure from scheduled discovery
+* Reliable offline threshold handling
+* Last completed session duration
+* Cumulative uptime statistics
 
 ---
 

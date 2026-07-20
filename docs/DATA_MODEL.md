@@ -6,6 +6,11 @@ The goal is to keep the core database simple, lightweight and extensible while a
 
 The data model is designed around long-term infrastructure management rather than temporary monitoring.
 
+> **Implementation status:** The core device and session models are now
+> implemented. Some field names and relationships described in this document
+> reflect the original design and will be synchronized with the implemented
+> SQLAlchemy models as development continues.
+
 ---
 
 # Design Principles

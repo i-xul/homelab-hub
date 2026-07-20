@@ -4,6 +4,30 @@ This document describes the planned architecture of **HomeLab Hub**.
 
 The system is designed to run on low-power hardware such as a Raspberry Pi 3 Model B+ while remaining modular, extensible and suitable for long-term use.
 
+## Implementation Status
+
+The initial architecture is now partially implemented.
+
+Currently operational components include:
+
+* Flask backend
+* SQLite persistence
+* REST API foundation
+* Web-based device inventory
+* Nmap and ARP-based network discovery
+* Hostname and manufacturer enrichment
+* Persistent device identification by MAC address
+* Manual network synchronization
+* Device metadata management
+* Device detail views
+* Device session tracking and history
+
+The next architectural step is background scan scheduling, which will connect
+network discovery, online/offline state management and session tracking into
+a continuously operating system.
+
+The primary deployment target remains the Raspberry Pi 3 Model B+.
+
 ---
 
 ## Architecture Goals

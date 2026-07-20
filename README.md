@@ -8,7 +8,7 @@ The project combines device discovery, inventory management, infrastructure moni
 
 ## Features
 
-### Current goals
+### Implemented or partially implemented
 
 * Automatic network device discovery
 * Device inventory with persistent history
@@ -143,9 +143,31 @@ Project language:
 
 ## Project Status
 
-**Planning**
+**Active development**
 
-The project is currently in the design phase. Development starts with the core infrastructure before additional modules and integrations are implemented.
+HomeLab Hub is currently under active development.
+
+The core application foundation is operational and currently includes:
+
+* Flask backend with SQLite persistence
+* Local network discovery using Nmap and ARP
+* MAC-based device identification
+* Hostname and manufacturer enrichment
+* Persistent device inventory
+* Known and unknown device management
+* Manual device metadata editing
+* IP assignment tracking
+* Manual network synchronization
+* Online and offline state foundation
+* Device detail views
+* Device session tracking and session history
+* Raspberry Pi 3 compatible architecture
+
+Current development is focused on automatic scheduled network discovery,
+reliable online/offline state tracking and continuous device session history.
+
+The project is developed incrementally, with each milestone intended to
+leave the application in a usable and testable state.
 
 ---
 
