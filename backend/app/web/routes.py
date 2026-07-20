@@ -29,6 +29,9 @@ from flask import render_template
 from app.database import SessionLocal
 from app.models import Device
 from app.services import get_inventory_devices
+from flask import abort
+
+from app.services import get_device_by_id
 
 
 web_bp = Blueprint(
@@ -129,4 +132,67 @@ def dashboard():
         primary_devices=primary_devices,
         offline_devices=offline_devices,
         summary=summary,
+    )
+
+# ---------------------------------------------------------
+# Device detail routes
+# ---------------------------------------------------------
+
+
+@web_bp.get("/devices/<int:device_id>")
+def device_details(device_id: int):
+    """
+    Render the detail page for one inventory device.
+
+    The page displays the device's current inventory metadata
+    and discovery state. Historical session information will be
+    added in a later development step.
+
+    Args:
+        device_id:
+            Database identifier of the requested device.
+
+    Returns:
+        Rendered device detail HTML response.
+
+    Raises:
+        404:
+            If no matching inventory device exists.
+    """
+
+    with SessionLocal() as database_session:
+        device = get_device_by_id(
+            database_session,
+            device_id,
+        )
+
+        if device is None:
+            abort(404)
+
+        device_data = {
+            "id": device.id,
+            "display_name": _get_display_name(device),
+            "friendly_name": device.friendly_name,
+            "hostname": device.hostname,
+            "current_ip": device.current_ip,
+            "mac_address": device.mac_address,
+            "manufacturer": device.manufacturer,
+            "model": device.model,
+            "device_type": device.device_type,
+            "online": device.online,
+            "trusted": device.trusted,
+            "pinned": device.pinned,
+            "ip_assignment": device.ip_assignment,
+            "expected_ip": device.expected_ip,
+            "last_discovery_at": device.last_discovery_at,
+            "consecutive_missed_scans": (
+                device.consecutive_missed_scans
+            ),
+            "created_at": device.created_at,
+            "updated_at": device.updated_at,
+        }
+
+    return render_template(
+        "device_details.html",
+        device=device_data,
     )

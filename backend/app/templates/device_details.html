@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        {{ device.display_name }} | HomeLab Hub
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/main.css') }}"
+    >
+</head>
+
+<body>
+    <header class="site-header">
+        <div>
+            <p class="eyebrow">
+                HomeLab Hub / Device
+            </p>
+
+            <h1>{{ device.display_name }}</h1>
+        </div>
+
+        <div class="header-actions">
+            <a
+                class="secondary-button"
+                href="{{ url_for('web.dashboard') }}"
+            >
+                Back to inventory
+            </a>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="device-detail-hero">
+            <div class="device-detail-status">
+                <span
+                    class="
+                        status-indicator
+                        {% if device.online %}
+                            status-indicator--online
+                        {% else %}
+                            status-indicator--offline
+                        {% endif %}
+                    "
+                ></span>
+
+                <strong>
+                    {% if device.online %}
+                        Online
+                    {% else %}
+                        Offline
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="device-detail-badges">
+                {% if device.trusted %}
+                    <span class="detail-badge">
+                        Trusted
+                    </span>
+                {% else %}
+                    <span class="unknown-badge">
+                        Unknown
+                    </span>
+                {% endif %}
+
+                {% if device.pinned %}
+                    <span class="detail-badge">
+                        ★ Pinned
+                    </span>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="device-detail-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
+                        Inventory
+                    </p>
+
+                    <h2>Identity</h2>
+                </div>
+            </div>
+
+            <dl class="detail-grid">
+                <div class="detail-item">
+                    <dt>Friendly name</dt>
+                    <dd>
+                        {{ device.friendly_name or "Not set" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Hostname</dt>
+                    <dd>
+                        {{ device.hostname or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>MAC address</dt>
+                    <dd>{{ device.mac_address }}</dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Manufacturer</dt>
+                    <dd>
+                        {{ device.manufacturer or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Model</dt>
+                    <dd>
+                        {{ device.model or "Not set" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Device type</dt>
+                    <dd>
+                        {{ device.device_type or "Not set" }}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="device-detail-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
+                        Network
+                    </p>
+
+                    <h2>Addressing</h2>
+                </div>
+            </div>
+
+            <dl class="detail-grid">
+                <div class="detail-item">
+                    <dt>Current IP</dt>
+                    <dd>
+                        {{ device.current_ip or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>IP assignment</dt>
+                    <dd>
+                        {{ device.ip_assignment | capitalize }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Expected IP</dt>
+                    <dd>
+                        {{ device.expected_ip or "Not set" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Missed scans</dt>
+                    <dd>
+                        {{ device.consecutive_missed_scans }}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="device-detail-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
+                        Discovery
+                    </p>
+
+                    <h2>Timeline</h2>
+                </div>
+            </div>
+
+            <dl class="detail-grid">
+                <div class="detail-item">
+                    <dt>First stored</dt>
+                    <dd>
+                        {{ device.created_at or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Last discovery</dt>
+                    <dd>
+                        {{ device.last_discovery_at or "Unknown" }}
+                    </dd>
+                </div>
+
+                <div class="detail-item">
+                    <dt>Last metadata update</dt>
+                    <dd>
+                        {{ device.updated_at or "Unknown" }}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+    </main>
+</body>
+</html>

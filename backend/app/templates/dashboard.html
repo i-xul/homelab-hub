@@ -116,7 +116,12 @@
 
                     <div class="device-main">
                         <div class="device-title-row">
-                            <h3>{{ device.display_name }}</h3>
+                            <h3>
+                                <a class="device-name-link"
+                                    href="{{ url_for('web.device_details', device_id=device.id) }}">
+                                    {{ device.display_name }}
+                                </a>
+                            </h3>
 
                             {% if device.pinned %}
                             <span class="pin-marker" title="Pinned device">
@@ -216,7 +221,12 @@
 
                     <div class="device-main">
                         <div class="device-title-row">
-                            <h3>{{ device.display_name }}</h3>
+                            <h3>
+                                <a class="device-name-link"
+                                    href="{{ url_for('web.device_details', device_id=device.id) }}">
+                                    {{ device.display_name }}
+                                </a>
+                            </h3>
 
                             {% if not device.trusted %}
                             <span class="unknown-badge">
