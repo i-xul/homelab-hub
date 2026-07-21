@@ -36,23 +36,29 @@ from .device_service import get_inventory_devices
 from .device_service import get_device_by_id
 from .device_service import update_device_metadata
 from .device_session_service import get_device_sessions
+from .scan_coordinator import execute_inventory_scan
+from .scan_coordinator import InventoryScanExecution
+from .scan_coordinator import ScanBusyError
 
 
 __all__ = [
     "close_device_session",
     "create_device",
     "DiscoverySyncResult",
+    "execute_inventory_scan",
     "get_all_devices",
+    "get_device_by_id",
     "get_device_by_mac",
-    "get_inventory_devices",
     "get_device_sessions",
+    "get_inventory_devices",
     "get_open_device_session",
+    "InventoryScanExecution",
     "mark_device_offline",
     "record_device_missed",
     "record_device_seen",
     "run_inventory_scan",
+    "ScanBusyError",
     "synchronize_discovered_devices",
     "update_device_from_discovery",
-    "get_device_by_id",
     "update_device_metadata",
 ]
