@@ -145,7 +145,7 @@ class InventoryScanScheduler:
 
         try:
             execution = execute_inventory_scan(
-                track_missing_devices=False,
+                track_missing_devices=True,
             )
         except ScanBusyError:
             logger.info(
@@ -168,9 +168,12 @@ class InventoryScanScheduler:
         logger.info(
             "Scheduled inventory scan completed: "
             "detected=%s created=%s updated=%s "
-            "skipped_without_mac=%s.",
+            "skipped_without_mac=%s missed=%s "
+            "marked_offline=%s.",
             result.detected,
             result.created,
             result.updated,
             result.skipped_without_mac,
+            result.missed,
+            result.marked_offline,
         )
