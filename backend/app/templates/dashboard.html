@@ -54,6 +54,65 @@
         </section>
         {% endif %}
 
+        <section class="discovery-status" aria-label="Network discovery status">
+            <div class="discovery-status__heading">
+                <span class="
+            discovery-status__indicator
+            {% if scheduler_status.running %}
+                discovery-status__indicator--running
+            {% else %}
+                discovery-status__indicator--stopped
+            {% endif %}
+        "></span>
+
+                <strong>Discovery</strong>
+            </div>
+
+            <div class="discovery-status__details">
+                <span>
+                    {% if scheduler_status.running %}
+                    Scheduler running
+                    {% else %}
+                    Scheduler stopped
+                    {% endif %}
+                </span>
+
+                {% if scheduler_status.interval_seconds %}
+                <span>
+                    Every {{ scheduler_status.interval_seconds // 60 }} min
+                </span>
+                {% endif %}
+
+                {% if scheduler_status.last_scan_started_at
+                and (
+                scheduler_status.last_scan_finished_at is none
+                or scheduler_status.last_scan_started_at
+                > scheduler_status.last_scan_finished_at
+                )
+                %}
+                <span class="discovery-status__scanning">
+                    Scanning now
+                </span>
+                {% elif scheduler_status.last_scan_finished_at %}
+                <span>
+                    Last scan:
+                    {{ scheduler_status.last_scan_finished_at.strftime("%H:%M:%S") }} UTC
+                </span>
+                {% else %}
+                <span>
+                    No automatic scans completed yet
+                </span>
+                {% endif %}
+
+                {% if scheduler_status.next_scan_at %}
+                <span>
+                    Next scan:
+                    {{ scheduler_status.next_scan_at.strftime("%H:%M:%S") }} UTC
+                </span>
+                {% endif %}
+            </div>
+        </section>
+
         <section class="summary-grid" aria-label="Inventory summary">
             <article class="summary-card">
                 <span>Total devices</span>

@@ -143,6 +143,58 @@ a {
     color: #d7b4b8;
 }
 
+.discovery-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid #2e333d;
+    border-radius: 0.8rem;
+    background: rgba(26, 29, 36, 0.72);
+}
+
+.discovery-status__heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.discovery-status__heading strong {
+    font-size: 0.9rem;
+}
+
+.discovery-status__indicator {
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 999px;
+}
+
+.discovery-status__indicator--running {
+    background: #55c985;
+    box-shadow: 0 0 0 0.2rem rgba(85, 201, 133, 0.12);
+}
+
+.discovery-status__indicator--stopped {
+    background: #626872;
+}
+
+.discovery-status__details {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem 1rem;
+    color: #9299a4;
+    font-size: 0.8rem;
+}
+
+.discovery-status__scanning {
+    color: #76d59b;
+    font-weight: 700;
+}
+
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

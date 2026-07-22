@@ -15,6 +15,8 @@ if __name__ == "__main__":
 
     scheduler = InventoryScanScheduler()
 
+    app.extensions["inventory_scan_scheduler"] = scheduler
+
     # Flask's debug reloader starts a parent monitoring process
     # and a separate child process that serves the application.
     # Start the scheduler only inside the serving process.

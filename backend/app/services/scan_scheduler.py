@@ -27,6 +27,10 @@ from threading import current_thread
 from threading import Event
 from threading import Lock
 from threading import Thread
+from dataclasses import dataclass
+from datetime import UTC
+from datetime import datetime
+from datetime import timedelta
 
 from app.discovery import DiscoveryError
 from app.settings import SCAN_INTERVAL_SECONDS
@@ -41,6 +45,17 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------
 # Background scan scheduler
 # ---------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class ScanSchedulerStatus:
+    """Describe the current background scan scheduler state."""
+
+    running: bool
+    interval_seconds: int
+    last_scan_started_at: datetime | None
+    last_scan_finished_at: datetime | None
+    next_scan_at: datetime | None
 
 
 class InventoryScanScheduler:
@@ -80,6 +95,9 @@ class InventoryScanScheduler:
         self._stop_event = Event()
         self._state_lock = Lock()
         self._thread: Thread | None = None
+        self._last_scan_started_at: datetime | None = None
+        self._last_scan_finished_at: datetime | None = None
+        self._next_scan_at: datetime | None = None
 
     @property
     def is_running(self) -> bool:
@@ -87,6 +105,21 @@ class InventoryScanScheduler:
 
         with self._state_lock:
             return self._thread is not None and self._thread.is_alive()
+
+    @property
+    def status(self) -> ScanSchedulerStatus:
+        """Return a thread-safe snapshot of scheduler state."""
+
+        with self._state_lock:
+            running = self._thread is not None and self._thread.is_alive()
+
+            return ScanSchedulerStatus(
+                running=running,
+                interval_seconds=self._interval_seconds,
+                last_scan_started_at=self._last_scan_started_at,
+                last_scan_finished_at=self._last_scan_finished_at,
+                next_scan_at=self._next_scan_at,
+            )
 
     def start(self) -> bool:
         """
@@ -102,6 +135,9 @@ class InventoryScanScheduler:
                 return False
 
             self._stop_event.clear()
+            self._next_scan_at = datetime.now(UTC) + timedelta(
+                seconds=self._interval_seconds
+            )
 
             self._thread = Thread(
                 target=self._run,
@@ -137,11 +173,29 @@ class InventoryScanScheduler:
         """Wait for scan intervals and execute scheduled scans."""
 
         while not self._stop_event.wait(self._interval_seconds):
+            with self._state_lock:
+                self._next_scan_at = None
+
             self._execute_scheduled_scan()
 
-    @staticmethod
-    def _execute_scheduled_scan() -> None:
+            if self._stop_event.is_set():
+                break
+
+            with self._state_lock:
+                self._next_scan_at = datetime.now(UTC) + timedelta(
+                    seconds=self._interval_seconds
+                )
+
+        with self._state_lock:
+            self._next_scan_at = None
+
+    def _execute_scheduled_scan(self) -> None:
         """Attempt one automatic inventory scan."""
+
+        scan_started_at = datetime.now(UTC)
+
+        with self._state_lock:
+            self._last_scan_started_at = scan_started_at
 
         try:
             execution = execute_inventory_scan(
@@ -164,6 +218,9 @@ class InventoryScanScheduler:
             return
 
         result = execution.result
+
+        with self._state_lock:
+            self._last_scan_finished_at = execution.finished_at
 
         logger.info(
             "Scheduled inventory scan completed: "

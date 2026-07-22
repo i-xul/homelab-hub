@@ -25,11 +25,14 @@ from __future__ import annotations
 
 from flask import Blueprint
 from flask import render_template
+from flask import current_app
+from flask import abort
 
 from app.database import SessionLocal
 from app.models import Device
 from app.services import get_inventory_devices
-from flask import abort
+from app.services import InventoryScanScheduler
+
 
 from app.services import get_device_by_id
 from datetime import datetime
@@ -65,6 +68,42 @@ def _get_display_name(device: Device) -> str:
     """
 
     return device.friendly_name or device.hostname or device.mac_address
+
+
+def _get_scheduler_status() -> dict:
+    """
+    Return background inventory scan scheduler status.
+
+    The scheduler is registered by the application entry point
+    in Flask's extensions dictionary.
+
+    Returns:
+        Dictionary containing scheduler state for the dashboard.
+    """
+
+    scheduler = current_app.extensions.get("inventory_scan_scheduler")
+
+    if not isinstance(
+        scheduler,
+        InventoryScanScheduler,
+    ):
+        return {
+            "running": False,
+            "interval_seconds": None,
+            "last_scan_started_at": None,
+            "last_scan_finished_at": None,
+            "next_scan_at": None,
+        }
+
+    status = scheduler.status
+
+    return {
+        "running": status.running,
+        "interval_seconds": status.interval_seconds,
+        "last_scan_started_at": status.last_scan_started_at,
+        "last_scan_finished_at": status.last_scan_finished_at,
+        "next_scan_at": status.next_scan_at,
+    }
 
 
 # ---------------------------------------------------------
@@ -183,11 +222,14 @@ def dashboard():
         "unknown": unknown_count,
     }
 
+    scheduler_status = _get_scheduler_status()
+
     return render_template(
         "dashboard.html",
         primary_devices=primary_devices,
         offline_devices=offline_devices,
         summary=summary,
+        scheduler_status=scheduler_status,
     )
 
 
