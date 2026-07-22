@@ -39,6 +39,7 @@ from .device_session_service import get_device_sessions
 from .scan_coordinator import execute_inventory_scan
 from .scan_coordinator import InventoryScanExecution
 from .scan_coordinator import ScanBusyError
+from .scan_scheduler import InventoryScanScheduler
 
 
 __all__ = [
@@ -52,6 +53,7 @@ __all__ = [
     "get_device_sessions",
     "get_inventory_devices",
     "get_open_device_session",
+    "InventoryScanScheduler",
     "InventoryScanExecution",
     "mark_device_offline",
     "record_device_missed",
