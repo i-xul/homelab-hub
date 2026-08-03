@@ -257,6 +257,27 @@ a {
     border: 1px solid #303640;
     border-radius: 0.8rem;
     background: #1a1d24;
+    cursor: pointer;
+    transition:
+        border-color 120ms ease,
+        background 120ms ease,
+        transform 120ms ease;
+}
+
+.device-card:hover {
+    border-color: #46505e;
+    background: #20242c;
+    transform: translateY(-1px);
+}
+
+.device-card:focus-visible {
+    outline: 2px solid #5d89ca;
+    outline-offset: 2px;
+}
+
+.device-card--inactive:hover {
+    border-color: #3a404b;
+    background: #1a1d24;
 }
 
 .device-card--inactive {

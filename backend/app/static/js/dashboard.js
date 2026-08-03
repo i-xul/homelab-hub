@@ -30,8 +30,12 @@
 
 const syncButton = document.querySelector("#sync-button");
 const syncStatus = document.querySelector("#sync-status");
+
 const deviceEditButtons =
     document.querySelectorAll(".device-edit-button");
+
+const deviceCards =
+    document.querySelectorAll(".device-card");
 
 const deviceEditModal =
     document.querySelector("#device-edit-modal");
@@ -143,6 +147,67 @@ if (syncButton) {
         runManualScan,
     );
 }
+
+// ---------------------------------------------------------
+// Device card navigation
+// ---------------------------------------------------------
+
+function isInteractiveCardTarget(target) {
+    /*
+     * Return whether the event originated from an element that
+     * already has its own interactive behaviour.
+     */
+
+    if (!(target instanceof Element)) {
+        return false;
+    }
+
+    return target.closest(
+        "a, button, input, select, textarea, label"
+    ) !== null;
+}
+
+
+function openDeviceCard(card) {
+    /*
+     * Navigate to the detail page stored on a device card.
+     */
+
+    const detailUrl = card.dataset.detailUrl;
+
+    if (!detailUrl) {
+        return;
+    }
+
+    window.location.assign(detailUrl);
+}
+
+
+deviceCards.forEach((card) => {
+    card.addEventListener("click", (event) => {
+        if (isInteractiveCardTarget(event.target)) {
+            return;
+        }
+
+        openDeviceCard(card);
+    });
+
+    card.addEventListener("keydown", (event) => {
+        if (
+            event.key !== "Enter"
+            && event.key !== " "
+        ) {
+            return;
+        }
+
+        if (isInteractiveCardTarget(event.target)) {
+            return;
+        }
+
+        event.preventDefault();
+        openDeviceCard(card);
+    });
+});
 
 // ---------------------------------------------------------
 // Device metadata editing

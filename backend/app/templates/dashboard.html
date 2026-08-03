@@ -151,11 +151,16 @@
             <div class="device-list">
                 {% for device in primary_devices %}
                 <article class="
-                                device-card
-                                {% if not device.online %}
-                                    device-card--inactive
-                                {% endif %}
-                            ">
+        device-card
+        {% if not device.online %}
+            device-card--inactive
+        {% endif %}
+    " data-detail-url="{{
+        url_for(
+            'web.device_details',
+            device_id=device.id
+        )
+    }}" role="link" tabindex="0" aria-label="Open details for {{ device.display_name }}">
                     <div class="device-status-column">
                         <span class="
                                         status-indicator
@@ -270,7 +275,12 @@
             {% if offline_devices %}
             <div class="device-list">
                 {% for device in offline_devices %}
-                <article class="device-card device-card--inactive">
+                <article class="device-card device-card--inactive" data-detail-url="{{
+        url_for(
+            'web.device_details',
+            device_id=device.id
+        )
+    }}" role="link" tabindex="0" aria-label="Open details for {{ device.display_name }}">
                     <div class="device-status-column">
                         <span class="
                                         status-indicator
