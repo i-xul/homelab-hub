@@ -155,6 +155,11 @@ a {
     background: rgba(26, 29, 36, 0.72);
 }
 
+.local-datetime {
+    color: inherit;
+    font: inherit;
+}
+
 .discovery-status__heading {
     display: flex;
     align-items: center;

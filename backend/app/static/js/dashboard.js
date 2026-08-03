@@ -37,6 +37,9 @@ const deviceEditButtons =
 const deviceCards =
     document.querySelectorAll(".device-card");
 
+const localDateTimeElements =
+    document.querySelectorAll(".local-datetime");
+
 const deviceEditModal =
     document.querySelector("#device-edit-modal");
 
@@ -70,6 +73,59 @@ const deviceEditExpectedIp =
 const deviceEditStatus =
     document.querySelector("#device-edit-status");
 
+// ---------------------------------------------------------
+// Local date and time formatting
+// ---------------------------------------------------------
+
+function formatLocalDateTime(element) {
+    /*
+     * Convert an ISO 8601 timestamp supplied by the backend
+     * into the browser user's local time zone.
+     */
+
+    const timestamp = element.getAttribute("datetime");
+
+    if (!timestamp) {
+        return;
+    }
+
+    const date = new Date(timestamp);
+
+    if (Number.isNaN(date.getTime())) {
+        return;
+    }
+
+    const format = element.dataset.format || "datetime";
+
+    const options = format === "time"
+        ? {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        }
+        : {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        };
+
+    element.textContent = new Intl.DateTimeFormat(
+        undefined,
+        options,
+    ).format(date);
+
+    element.title = `UTC: ${timestamp}`;
+}
+
+
+localDateTimeElements.forEach(
+    formatLocalDateTime,
+);
 
 // ---------------------------------------------------------
 // Manual synchronization

@@ -96,7 +96,10 @@
                 {% elif scheduler_status.last_scan_finished_at %}
                 <span>
                     Last scan:
-                    {{ scheduler_status.last_scan_finished_at.strftime("%H:%M:%S") }} UTC
+                    <time class="local-datetime" datetime="{{ scheduler_status.last_scan_finished_at.isoformat() }}"
+                        data-format="time">
+                        {{ scheduler_status.last_scan_finished_at.strftime("%H:%M:%S") }} UTC
+                    </time>
                 </span>
                 {% else %}
                 <span>
@@ -107,7 +110,10 @@
                 {% if scheduler_status.next_scan_at %}
                 <span>
                     Next scan:
-                    {{ scheduler_status.next_scan_at.strftime("%H:%M:%S") }} UTC
+                    <time class="local-datetime" datetime="{{ scheduler_status.next_scan_at.isoformat() }}"
+                        data-format="time">
+                        {{ scheduler_status.next_scan_at.strftime("%H:%M:%S") }} UTC
+                    </time>
                 </span>
                 {% endif %}
             </div>
