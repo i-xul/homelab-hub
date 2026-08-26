@@ -23,11 +23,13 @@ from .base import Base
 from .device import Device
 from .device_session import DeviceSession
 from .mixins import TimestampMixin
+from .tag import Tag
 
 
 __all__ = [
     "Base",
     "Device",
     "DeviceSession",
+    "Tag",
     "TimestampMixin",
 ]

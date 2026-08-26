@@ -34,6 +34,7 @@ from sqlalchemy.orm import mapped_column
 
 from .base import Base
 from .mixins import TimestampMixin
+from .device_tag import device_tags
 
 from typing import TYPE_CHECKING
 
@@ -41,6 +42,7 @@ from sqlalchemy.orm import relationship
 
 if TYPE_CHECKING:
     from .device_session import DeviceSession
+    from .tag import Tag
 
 
 class Device(Base, TimestampMixin):
@@ -162,4 +164,9 @@ class Device(Base, TimestampMixin):
         back_populates="device",
         cascade="all, delete-orphan",
         order_by="DeviceSession.session_start",
+    )
+
+    tags: Mapped[list["Tag"]] = relationship(
+        secondary=device_tags,
+        back_populates="devices",
     )
