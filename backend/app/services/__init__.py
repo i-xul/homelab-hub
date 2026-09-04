@@ -41,6 +41,12 @@ from .scan_coordinator import InventoryScanExecution
 from .scan_coordinator import ScanBusyError
 from .scan_scheduler import InventoryScanScheduler
 from .scan_scheduler import ScanSchedulerStatus
+from .tag_service import assign_tag_to_device
+from .tag_service import create_tag
+from .tag_service import get_all_tags
+from .tag_service import get_tag_by_id
+from .tag_service import get_tag_by_name
+from .tag_service import remove_tag_from_device
 
 
 __all__ = [
@@ -65,4 +71,10 @@ __all__ = [
     "synchronize_discovered_devices",
     "update_device_from_discovery",
     "update_device_metadata",
+    "assign_tag_to_device",
+    "create_tag",
+    "get_all_tags",
+    "get_tag_by_id",
+    "get_tag_by_name",
+    "remove_tag_from_device",
 ]
