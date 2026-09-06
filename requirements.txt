@@ -1,5 +1,6 @@
 Flask>=3.1,<4.0
 python-dotenv>=1.1,<2.0
+Gunicorn>=26.0,<27.0
 
 SQLAlchemy>=2.0,<3.0
 Alembic>=1.16,<2.0
