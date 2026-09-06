@@ -32,6 +32,7 @@ from app.database import SessionLocal
 from app.models import Device
 from app.services import get_inventory_devices
 from app.services import InventoryScanScheduler
+from app.services import get_all_tags
 
 
 from app.services import get_device_by_id
@@ -272,6 +273,10 @@ def device_details(device_id: int):
             device.id,
         )
 
+        all_tags = get_all_tags(
+            database_session,
+        )
+
         device_data = {
             "id": device.id,
             "display_name": _get_display_name(device),
@@ -291,6 +296,17 @@ def device_details(device_id: int):
             "consecutive_missed_scans": (device.consecutive_missed_scans),
             "created_at": device.created_at,
             "updated_at": device.updated_at,
+            "tags": [
+                {
+                    "id": tag.id,
+                    "name": tag.name,
+                    "color": tag.color,
+                }
+                for tag in sorted(
+                    device.tags,
+                    key=lambda item: item.name.lower(),
+                )
+            ],
         }
 
         session_data = [
@@ -301,6 +317,15 @@ def device_details(device_id: int):
                 "session_end": session.session_end,
             }
             for session in sessions
+        ]
+
+        all_tag_data = [
+            {
+                "id": tag.id,
+                "name": tag.name,
+                "color": tag.color,
+            }
+            for tag in all_tags
         ]
 
     current_session = next(
@@ -338,9 +363,21 @@ def device_details(device_id: int):
         "current_session_duration": (current_session_duration),
     }
 
+    assigned_tag_ids = {
+        tag["id"]
+        for tag in device_data["tags"]
+    }
+
+    available_tags = [
+        tag
+        for tag in all_tag_data
+        if tag["id"] not in assigned_tag_ids
+    ]
+
     return render_template(
         "device_details.html",
         device=device_data,
         sessions=session_data,
         history=history_summary,
+        available_tags=available_tags,
     )

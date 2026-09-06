@@ -124,6 +124,131 @@
             </dl>
         </section>
 
+        <section
+            class="device-detail-section"
+            id="device-tags"
+            data-device-id="{{ device.id }}"
+        >
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
+                        Classification
+                    </p>
+
+                    <h2>Tags</h2>
+                </div>
+
+                <span class="device-count">
+                    {{ device.tags | length }}
+                </span>
+            </div>
+
+            <div class="tag-management">
+                <div class="tag-list" id="device-tag-list">
+                    {% if device.tags %}
+                    {% for tag in device.tags %}
+                    <span class="tag-chip">
+                        <span>{{ tag.name }}</span>
+
+                        <button
+                            class="tag-remove-button"
+                            type="button"
+                            data-tag-id="{{ tag.id }}"
+                            aria-label="Remove tag {{ tag.name }}"
+                            title="Remove tag"
+                        >
+                            ×
+                        </button>
+                    </span>
+                    {% endfor %}
+                    {% else %}
+                    <p class="tag-empty-state">
+                        No tags assigned to this device.
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="tag-controls">
+                    <form
+                        class="tag-form"
+                        id="assign-tag-form"
+                    >
+                        <label
+                            class="form-field"
+                            for="available-tag-select"
+                        >
+                            <span>Existing tag</span>
+
+                            <select
+                                id="available-tag-select"
+                                {% if not available_tags %}
+                                disabled
+                                {% endif %}
+                            >
+                                <option value="">
+                                    {% if available_tags %}
+                                    Select tag...
+                                    {% else %}
+                                    No unassigned tags available
+                                    {% endif %}
+                                </option>
+
+                                {% for tag in available_tags %}
+                                <option value="{{ tag.id }}">
+                                    {{ tag.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+
+                        <button
+                            class="secondary-button"
+                            type="submit"
+                            {% if not available_tags %}
+                            disabled
+                            {% endif %}
+                        >
+                            Add
+                        </button>
+                    </form>
+
+                    <form
+                        class="tag-form"
+                        id="create-tag-form"
+                    >
+                        <label
+                            class="form-field"
+                            for="new-tag-name"
+                        >
+                            <span>New tag</span>
+
+                            <input
+                                id="new-tag-name"
+                                type="text"
+                                maxlength="100"
+                                autocomplete="off"
+                                placeholder="Tag name"
+                                required
+                            >
+                        </label>
+
+                        <button
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Create &amp; add
+                        </button>
+                    </form>
+                </div>
+
+                <p
+                    class="form-status"
+                    id="tag-status"
+                    aria-live="polite"
+                ></p>
+            </div>
+        </section>
+
         <section class="device-detail-section">
             <div class="section-heading">
                 <div>
@@ -328,6 +453,7 @@
         </section>
 
     </main>
+    <script src="{{ url_for('static', filename='js/device_details.js') }}"></script>
 </body>
 
 </html>

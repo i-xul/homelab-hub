@@ -502,6 +502,84 @@ a {
     color: #76d59b;
 }
 
+.tag-management {
+    display: grid;
+    gap: 1rem;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2rem;
+    padding: 0.3rem 0.45rem 0.3rem 0.7rem;
+    border: 1px solid #3b4654;
+    border-radius: 999px;
+    background: #1a1d24;
+    color: #d8dee9;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.tag-remove-button {
+    display: inline-flex;
+    width: 1.35rem;
+    height: 1.35rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #9299a4;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.tag-remove-button:hover {
+    background: #292e38;
+    color: #f2aab2;
+}
+
+.tag-remove-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.tag-empty-state {
+    margin: 0;
+    color: #9299a4;
+    font-size: 0.85rem;
+}
+
+.tag-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.tag-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid #303640;
+    border-radius: 0.8rem;
+    background: #1a1d24;
+}
+
+.tag-form .form-field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
 @media (max-width: 48rem) {
     .site-header {
         align-items: flex-start;
@@ -552,6 +630,15 @@ a {
 
     .session-card {
         align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tag-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .tag-form {
+        align-items: stretch;
         flex-direction: column;
     }
 
