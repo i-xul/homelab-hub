@@ -106,6 +106,17 @@ def _serialize_device(
         "pinned": device.pinned,
         "last_discovery_at": _serialize_datetime(device.last_discovery_at),
         "consecutive_missed_scans": (device.consecutive_missed_scans),
+        "tags": [
+            {
+                "id": tag.id,
+                "name": tag.name,
+                "color": tag.color,
+            }
+            for tag in sorted(
+                device.tags,
+                key=lambda item: item.name.lower(),
+            )
+        ],
         "created_at": _serialize_datetime(device.created_at),
         "updated_at": _serialize_datetime(device.updated_at),
     }
