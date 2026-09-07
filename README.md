@@ -2,28 +2,46 @@
 
 **HomeLab Hub** is a self-hosted infrastructure management platform designed for Raspberry Pi and homelab environments.
 
-The project combines device discovery, inventory management, infrastructure monitoring, documentation, benchmarking and service integrations into a single lightweight web interface. It is designed to run efficiently on low-power hardware such as the Raspberry Pi 3 Model B+ while remaining modular and extensible.
+The project combines device discovery, persistent inventory management, device history, documentation and future infrastructure monitoring into a single lightweight web interface. It is designed to run efficiently on low-power hardware such as the Raspberry Pi 3 Model B+ while remaining modular and extensible.
 
 ---
 
 ## Features
 
-### Implemented or partially implemented
+### Implemented
 
 * Automatic network device discovery
-* Device inventory with persistent history
-* Known and unknown device detection
+* Manual network synchronization
+* Persistent device inventory
+* MAC-based device identification
+* Hostname and manufacturer enrichment
+* Known and unknown device management
 * Online and offline device tracking
+* Configurable missed-scan threshold
 * Device pinning
-* Device tags and categories
-* Manual notes and documentation
-* Device photo support
-* Session history (first seen, last seen, online duration)
-* Lightweight web interface
+* Device metadata editing
+* IP assignment tracking
+* Device detail views
+* Device tags
+* Tag management through the web interface and REST API
+* Device session tracking
+* Historical session display
+* Automatic session closure
+* Explicit user-requested device deletion
+* Automatic scheduled network scanning
+* Scan overlap protection
+* Scheduler status reporting
+* Lightweight responsive web interface
 * REST API
+* Raspberry Pi 3 production deployment
+* Gunicorn production server
+* systemd service
 
-### Planned modules
+### Planned
 
+* Device notes and documentation
+* Device photo support
+* Cumulative uptime statistics
 * Linux monitoring agent
 * Windows monitoring agent
 * Docker integration
@@ -51,57 +69,50 @@ The project combines device discovery, inventory management, infrastructure moni
               ┌──────────┴──────────┐
               │                     │
          SQLite Database      Network Discovery
-              │                     │
-              └──────────┬──────────┘
-                         │
-              Monitoring Agents
-                         │
-     Raspberry Pi • Linux • Windows
+                                    │
+                                    │
+                              Scan Scheduler
 ```
 
-The backend is designed using an **API-first** architecture, allowing multiple clients such as the web interface, Android application and optional integrations to use the same backend services.
+Future monitoring agents and integrations will communicate with the backend through the REST API.
+
+The backend follows an **API-first** architecture, allowing multiple clients such as the web interface, monitoring agents, Android applications and optional integrations to use the same backend services.
 
 ---
 
 ## Roadmap
 
-### Phase 1
+### Completed foundation
 
 * Core backend
 * SQLite database
 * Device discovery
-* Device inventory
-* Basic web interface
-
-### Phase 2
-
+* Persistent device inventory
+* Manual synchronization
+* Automatic scheduled discovery
+* Online and offline tracking
 * Device sessions
-* Offline device history
-* Known/unknown device management
-* Tags
-* Notes
-* Photos
+* Device tags
+* Explicit device deletion
+* Raspberry Pi 3 production deployment
 
-### Phase 3
+### Current inventory work
+
+* Device notes
+* Device photos
+* Additional availability statistics
+
+### Future development
 
 * Monitoring agents
-* Hardware statistics
-* Temperature monitoring
+* Infrastructure dashboard
+* Service and Docker integrations
 * Benchmark history
-
-### Phase 4
-
-* Infrastructure integrations
-* Docker
-* Services
-* Security dashboard
-* Optional Kindle integration
-
-### Phase 5
-
+* Optional integrations
 * Android application
-* Additional plugins
-* Advanced reporting
+* Plugin system
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the detailed milestone roadmap.
 
 ---
 
@@ -109,7 +120,12 @@ The backend is designed using an **API-first** architecture, allowing multiple c
 
 * Python
 * Flask
+* SQLAlchemy
+* Alembic
 * SQLite
+* Gunicorn
+* systemd
+* Nmap
 * HTML
 * CSS
 * JavaScript
@@ -123,11 +139,12 @@ The backend is designed using an **API-first** architecture, allowing multiple c
 * Self-hosted
 * API-first
 * Modular
-* Plugin-based
 * Privacy-first
 * Raspberry Pi friendly
 * Open source
 * Easy to maintain
+* Persistent historical inventory
+* No automatic device deletion
 
 ---
 
@@ -141,16 +158,38 @@ Project language:
 
 ---
 
+## Production Deployment
+
+The primary production deployment runs on a **Raspberry Pi 3 Model B+**.
+
+The current production architecture uses:
+
+* Linux
+* Python virtual environment
+* Flask
+* Gunicorn
+* SQLite
+* systemd
+* Nmap-based network discovery
+* Automatic scheduled scanning
+
+Gunicorn currently runs with a single worker because the scan scheduler operates inside the application process.
+
+The application is intended for private-network use and does not require public internet exposure.
+
+---
+
 ## Project Status
 
 **Active development**
 
-HomeLab Hub is currently under active development.
+HomeLab Hub is operational as a persistent Raspberry Pi 3 service.
 
-The core application foundation is operational and currently includes:
+The current implementation includes:
 
-* Flask backend with SQLite persistence
-* Local network discovery using Nmap and ARP
+* Flask backend with SQLAlchemy and SQLite persistence
+* Alembic database migrations
+* Local network discovery using Nmap and ARP-related system information
 * MAC-based device identification
 * Hostname and manufacturer enrichment
 * Persistent device inventory
@@ -158,20 +197,36 @@ The core application foundation is operational and currently includes:
 * Manual device metadata editing
 * IP assignment tracking
 * Manual network synchronization
-* Online and offline state foundation
+* Automatic scheduled network discovery
+* Scan overlap protection
+* Scheduler status reporting
+* Reliable automatic online and offline tracking
+* Configurable offline threshold handling
 * Device detail views
-* Device session tracking and session history
-* Raspberry Pi 3 compatible architecture
+* Device session tracking and history
+* Device tags
+* Explicit user-requested device deletion
+* Gunicorn production serving
+* systemd-based service management
+* Raspberry Pi 3 production deployment
 
-Current development is focused on automatic scheduled network discovery,
-reliable online/offline state tracking and continuous device session history.
+Current development is focused on completing the remaining inventory features, especially device notes and photographs, before moving into host monitoring and broader infrastructure functionality.
 
-The project is developed incrementally, with each milestone intended to
-leave the application in a usable and testable state.
+The project is developed incrementally, with each milestone intended to leave the application in a usable and testable state.
+
+---
+
+## Documentation
+
+Additional documentation:
+
+* [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+* [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md)
+* [`docs/PROJECT_PRINCIPLES.md`](docs/PROJECT_PRINCIPLES.md)
+* [`docs/ROADMAP.md`](docs/ROADMAP.md)
 
 ---
 
 ## License
 
-This project will be released under the MIT License.
-
+This project is released under the MIT License.

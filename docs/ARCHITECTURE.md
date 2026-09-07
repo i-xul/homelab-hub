@@ -6,27 +6,40 @@ The system is designed to run on low-power hardware such as a Raspberry Pi 3 Mod
 
 ## Implementation Status
 
-The initial architecture is now partially implemented.
+The core architecture is operational and deployed on a Raspberry Pi 3 Model B+.
 
 Currently operational components include:
 
 * Flask backend
-* SQLite persistence
-* REST API foundation
+* SQLAlchemy and SQLite persistence
+* Alembic database migrations
+* REST API
 * Web-based device inventory
-* Nmap and ARP-based network discovery
+* Nmap and ARP-related network discovery
 * Hostname and manufacturer enrichment
 * Persistent device identification by MAC address
 * Manual network synchronization
+* Automatic scheduled network discovery
+* Shared scan coordination and overlap protection
+* Automatic online and offline state management
+* Configurable missed-scan threshold
 * Device metadata management
 * Device detail views
+* Device pinning
+* Device tags
 * Device session tracking and history
+* Automatic session closure
+* Explicit user-requested device deletion
+* Scheduler status reporting
+* Gunicorn production serving
+* systemd service management
 
-The next architectural step is background scan scheduling, which will connect
-network discovery, online/offline state management and session tracking into
-a continuously operating system.
+The application is running continuously on its primary deployment target,
+a Raspberry Pi 3 Model B+.
 
-The primary deployment target remains the Raspberry Pi 3 Model B+.
+The remaining core inventory work currently consists primarily of device
+notes and photographs. Monitoring agents and broader infrastructure
+functionality remain future development areas.
 
 ---
 
@@ -183,11 +196,13 @@ Examples include:
 * scheduled cleanup
 * optional integration polling
 
-The default network discovery interval is planned to be approximately five minutes.
+The default network discovery interval is five minutes and can be configured through the application settings.
 
-The user must also be able to trigger an immediate scan manually through the web interface.
+The user can also trigger an immediate scan manually through the web interface.
 
-Only one network scan should run at a time.
+Automatic and manual scans use shared scan coordination so that only one network scan can run at a time.
+
+Scheduled scans update device online/offline state and session history independently of user interaction with the web interface.
 
 ---
 
@@ -195,11 +210,7 @@ Only one network scan should run at a time.
 
 Network discovery detects devices visible on the local network.
 
-The first implementation is expected to use tools such as:
-
-* ARP or neighbor table inspection
-* ping scanning
-* Nmap
+The current implementation uses Nmap together with local network and neighbor information for device discovery and enrichment.
 
 The discovery process should collect data such as:
 
@@ -477,21 +488,25 @@ External applications should remain independent services and should not be merge
 
 ## Deployment
 
-The initial deployment target is a Raspberry Pi 3 Model B+.
+The primary production deployment runs on a Raspberry Pi 3 Model B+.
 
-The planned production environment includes:
+The current production environment includes:
 
 * Linux
 * Python virtual environment
 * Flask application
+* Gunicorn production server
 * SQLite database
 * systemd service
-* reverse proxy when needed
-* local or VPN-only access
+* Nmap-based network discovery
+* automatic scheduled scanning
+* local private-network access
 
-Development should remain possible on a separate Linux workstation.
+Gunicorn currently uses a single worker because the scan scheduler runs inside the application process. Running multiple application workers would otherwise create multiple independent scheduler instances.
 
-Configuration, runtime data and source code should remain clearly separated.
+The systemd service starts HomeLab Hub automatically during boot and keeps the application running independently of an interactive shell session.
+
+Development remains separate from the production installation. Configuration, runtime data and source code remain clearly separated.
 
 ---
 

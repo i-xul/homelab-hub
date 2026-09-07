@@ -6,10 +6,10 @@ The goal is to keep the core database simple, lightweight and extensible while a
 
 The data model is designed around long-term infrastructure management rather than temporary monitoring.
 
-> **Implementation status:** The core device and session models are now
-> implemented. Some field names and relationships described in this document
-> reflect the original design and will be synchronized with the implemented
-> SQLAlchemy models as development continues.
+> **Implementation status:** The core Device, Device Session and Tag models
+> are implemented and in production use. Device Notes, Device Photos and
+> Agent Status remain planned extensions. This document describes both the
+> implemented core and the intended direction of the remaining data model.
 
 ---
 
@@ -30,12 +30,12 @@ The following principles define how the data model should evolve.
 
 The first version of HomeLab Hub is built around the following core entities.
 
-* Device
-* Device Session
-* Tag
-* Device Note
-* Device Photo
-* Agent Status
+* Device — implemented
+* Device Session — implemented
+* Tag — implemented
+* Device Note — planned
+* Device Photo — planned
+* Agent Status — planned
 
 Additional entities may be added later as the project evolves.
 
@@ -75,15 +75,23 @@ Changing IP addresses should not create duplicate devices.
 
 The MAC address should normally be treated as the primary identifier.
 
+Devices are never removed automatically. A device can be permanently deleted
+only through an explicit user-requested deletion.
+
+Deleting a device also removes its associated device sessions and tag
+associations. Tags themselves remain available for use by other devices.
+
 ---
 
 # Device Session
 
 Represents one continuous online period.
 
-Every time a device appears on the network, a session begins.
+A session begins when a new or previously offline device is detected.
 
-When the device disappears, the session ends.
+A session remains active while the device is considered online. When the
+configured missed-scan threshold is reached, the device is marked offline and
+the active session is closed.
 
 ## Fields
 
@@ -125,6 +133,9 @@ Examples:
 * name
 * color
 
+Tags use a many-to-many relationship with devices. A tag can be assigned to
+multiple devices and a device can have multiple tags.
+
 ---
 
 # Device Tag
@@ -139,6 +150,8 @@ A many-to-many relationship between devices and tags.
 ---
 
 # Device Note
+
+**Status: Planned**
 
 Stores documentation written by the user.
 
@@ -163,6 +176,8 @@ Examples include:
 
 # Device Photo
 
+**Status: Planned**
+
 Stores references to device photographs.
 
 The image itself should be stored on disk rather than inside the database.
@@ -178,6 +193,8 @@ The image itself should be stored on disk rather than inside the database.
 ---
 
 # Agent Status
+
+**Status: Planned**
 
 Stores the most recent information received from a monitoring agent.
 
