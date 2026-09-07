@@ -392,3 +392,33 @@ def update_device_metadata(
     database_session.refresh(device)
 
     return device
+
+# ---------------------------------------------------------
+# Device deletion
+# ---------------------------------------------------------
+
+
+def delete_device(
+    database_session: Session,
+    device: Device,
+) -> None:
+    """
+    Permanently remove a device from the inventory.
+
+    Related device sessions and tag associations are removed
+    through the configured SQLAlchemy relationships and
+    database foreign-key cascades.
+
+    Devices are never deleted automatically. This operation is
+    intended only for an explicit user-requested deletion.
+
+    Args:
+        database_session:
+            Active SQLAlchemy database session.
+
+        device:
+            Device instance to remove.
+    """
+
+    database_session.delete(device)
+    database_session.commit()

@@ -451,6 +451,50 @@
                 </div>
             </dl>
         </section>
+        <section
+            class="device-detail-section danger-zone"
+            id="device-deletion"
+            data-device-id="{{ device.id }}"
+            data-device-name="{{ device.display_name }}"
+        >
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">
+                        Danger zone
+                    </p>
+
+                    <h2>Delete device</h2>
+                </div>
+            </div>
+
+            <div class="danger-zone-card">
+                <div>
+                    <strong>
+                        Permanently remove this device
+                    </strong>
+
+                    <p>
+                        This removes the device, its session
+                        history and tag associations from the
+                        inventory. This action cannot be undone.
+                    </p>
+                </div>
+
+                <button
+                    class="danger-button"
+                    id="delete-device-button"
+                    type="button"
+                >
+                    Delete device
+                </button>
+            </div>
+
+            <p
+                class="form-status"
+                id="delete-device-status"
+                aria-live="polite"
+            ></p>
+        </section>
 
     </main>
     <script src="{{ url_for('static', filename='js/device_details.js') }}"></script>

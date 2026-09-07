@@ -580,6 +580,57 @@ a {
     margin-bottom: 0;
 }
 
+.danger-zone {
+    padding-top: 1rem;
+    border-top: 1px solid #4d2d32;
+}
+
+.danger-zone .eyebrow {
+    color: #d88790;
+}
+
+.danger-zone-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #713941;
+    border-radius: 0.8rem;
+    background: rgba(113, 39, 48, 0.14);
+}
+
+.danger-zone-card strong {
+    color: #ffb8bf;
+}
+
+.danger-zone-card p {
+    margin: 0.4rem 0 0;
+    color: #cba5aa;
+    font-size: 0.85rem;
+}
+
+.danger-button {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid #9b4852;
+    border-radius: 0.65rem;
+    background: #713039;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.danger-button:hover {
+    background: #873943;
+}
+
+.danger-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
 @media (max-width: 48rem) {
     .site-header {
         align-items: flex-start;
@@ -640,6 +691,15 @@ a {
     .tag-form {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .danger-zone-card {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .danger-button {
+        width: 100%;
     }
 
 }

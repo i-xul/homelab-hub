@@ -50,6 +50,20 @@ const tagRemoveButtons =
 
 
 // ---------------------------------------------------------
+// Device deletion elements
+// ---------------------------------------------------------
+
+const deviceDeletionSection =
+    document.querySelector("#device-deletion");
+
+const deleteDeviceButton =
+    document.querySelector("#delete-device-button");
+
+const deleteDeviceStatus =
+    document.querySelector("#delete-device-status");
+
+
+// ---------------------------------------------------------
 // Tag helpers
 // ---------------------------------------------------------
 
@@ -300,6 +314,87 @@ async function removeTag(button) {
 
 
 // ---------------------------------------------------------
+// Device deletion
+// ---------------------------------------------------------
+
+async function deleteDevice() {
+    /*
+     * Permanently remove the current device after explicit
+     * confirmation from the user.
+     */
+
+    if (
+        !deviceDeletionSection
+        || !deleteDeviceButton
+    ) {
+        return;
+    }
+
+    const deviceId =
+        deviceDeletionSection.dataset.deviceId;
+
+    const deviceName =
+        deviceDeletionSection.dataset.deviceName
+        || "this device";
+
+    if (!deviceId) {
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Permanently delete "${deviceName}" from the inventory?\n\n`
+        + "Its session history and tag associations will also "
+        + "be removed. This action cannot be undone."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    deleteDeviceButton.disabled = true;
+
+    if (deleteDeviceStatus) {
+        deleteDeviceStatus.className = "form-status";
+        deleteDeviceStatus.textContent = "Deleting device…";
+    }
+
+    try {
+        const response = await fetch(
+            `/api/devices/${deviceId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Accept": "application/json",
+                },
+            },
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                payload.message || "Device deletion failed."
+            );
+        }
+
+        window.location.href = "/";
+    } catch (error) {
+        deleteDeviceButton.disabled = false;
+
+        if (deleteDeviceStatus) {
+            deleteDeviceStatus.className =
+                "form-status form-status--error";
+
+            deleteDeviceStatus.textContent =
+                error instanceof Error
+                    ? error.message
+                    : "Device deletion failed.";
+        }
+    }
+}
+
+
+// ---------------------------------------------------------
 // Event registration
 // ---------------------------------------------------------
 
@@ -325,3 +420,10 @@ tagRemoveButtons.forEach((button) => {
         () => removeTag(button),
     );
 });
+
+if (deleteDeviceButton) {
+    deleteDeviceButton.addEventListener(
+        "click",
+        deleteDevice,
+    );
+}

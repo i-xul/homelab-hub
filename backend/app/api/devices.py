@@ -37,6 +37,7 @@ import ipaddress
 
 from flask import request
 
+from app.services import delete_device
 from app.services import get_device_by_id
 from app.services import update_device_metadata
 
@@ -362,5 +363,50 @@ def update_device(device_id: int):
         {
             "status": "updated",
             "device": response_data,
+        }
+    )
+
+
+@devices_bp.delete("/devices/<int:device_id>")
+def remove_device(device_id: int):
+    """
+    Permanently remove one device from the inventory.
+
+    Device deletion is always an explicit user action.
+    Related session history and tag associations are removed
+    together with the device.
+
+    Returns:
+        HTTP 200 when the device was deleted successfully.
+
+        HTTP 404 when the requested device does not exist.
+    """
+
+    with SessionLocal() as database_session:
+        device = get_device_by_id(
+            database_session,
+            device_id,
+        )
+
+        if device is None:
+            return (
+                jsonify(
+                    {
+                        "status": "error",
+                        "message": "Device not found.",
+                    }
+                ),
+                404,
+            )
+
+        delete_device(
+            database_session,
+            device,
+        )
+
+    return jsonify(
+        {
+            "status": "deleted",
+            "device_id": device_id,
         }
     )

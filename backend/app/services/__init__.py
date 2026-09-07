@@ -32,6 +32,7 @@ from .device_service import get_all_devices
 from .device_session_service import close_device_session
 from .device_session_service import record_device_missed
 from .inventory_service import run_inventory_scan
+from .device_service import delete_device
 from .device_service import get_inventory_devices
 from .device_service import get_device_by_id
 from .device_service import update_device_metadata
@@ -52,6 +53,7 @@ from .tag_service import remove_tag_from_device
 __all__ = [
     "close_device_session",
     "create_device",
+    "delete_device",
     "DiscoverySyncResult",
     "execute_inventory_scan",
     "get_all_devices",
